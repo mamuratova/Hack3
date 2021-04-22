@@ -55,13 +55,12 @@ class CategorySerializer(serializers.ModelSerializer):
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
-        fields = ('id', 'product', 'user', 'like')
+        fields = ('id', 'product', 'like')
 
     def get_fields(self):
         action = self.context.get('action')
         fields = super().get_fields()
         if action == 'create':
-            fields.pop('user')
             fields.pop('like')
         return fields
 
@@ -74,6 +73,11 @@ class LikeSerializer(serializers.ModelSerializer):
         like.save()
         return like
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['like'] = instance.like
+        representation['user'] = instance.user.email
+        return representation
 
 class ParsSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=255)
