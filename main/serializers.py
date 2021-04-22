@@ -27,6 +27,7 @@ class ProductSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['comments'] = CommentSerializer(instance.comments.all(), many=True).data
         representation['likes'] = len(LikeSerializer(instance.likes.filter(like=True), many=True, context=self.context).data)
+        pr = Product.objects.filter(category=instance.category.slug)
         comment = CommentSerializer(instance.comments.all(), many=True, context=self.context).data
         return representation
 
