@@ -12,6 +12,20 @@ from .parsing import pars
 from .permissions import IsCommentAuthor
 
 
+class MyPaginationClass(PageNumberPagination):
+    page_size = 1
+
+    def get_paginated_response(self, data):
+        for i in range(self.page_size):
+            text = data[i]['description']
+            data[i]['description'] = text[:15] + '...'
+            likes = data[i]['likes']
+            data[i]['likes'] = len(likes)
+            comments = data[i]['comments']
+            data[i]['comments'] = len(comments)
+        return super().get_paginated_response(data)
+
+
 class PermissionMixin:
     def get_permissions(self):
         if self.action == 'create':
@@ -37,7 +51,7 @@ class PermissionForComment:
 class ProductViewSet(PermissionMixin, ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    # pagination_class = MyPaginationClass
+    pagination_class = MyPaginationClass
 
     @action(methods=['GET'], detail=False)
     def search(self, request):
