@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from .serializers import *
 from .parsing import pars
+from .permissions import IsCommentAuthor
 
 
 class PermissionMixin:
@@ -17,6 +18,17 @@ class PermissionMixin:
             permissions = [IsAdminUser, ]
         elif self.action in ('update', 'partial_update', 'destroy'):
             permissions = [IsAdminUser, ]
+        else:
+            permissions = []
+        return [permission() for permission in permissions]
+
+
+class PermissionForComment:
+    def get_permissions(self):
+        if self.action == 'create':
+            permissions = [IsAuthenticated, ]
+        elif self.action in ('update', 'partial_update', 'destroy'):
+            permissions = [IsCommentAuthor, ]
         else:
             permissions = []
         return [permission() for permission in permissions]
@@ -42,15 +54,13 @@ class ProductViewSet(PermissionMixin, ModelViewSet):
             queryset = self.get_queryset().order_by('name')
         elif filter == 'Z-A':
             queryset = self.get_queryset().order_by('-name')
-        # elif filter == 'replies':
-        #     queryset = self.get_queryset().order_by('self.get_object().replies.count()')
         else:
             queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CommentViewSet(ModelViewSet):
+class CommentViewSet(PermissionForComment, ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, ]
