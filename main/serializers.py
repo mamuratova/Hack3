@@ -79,6 +79,7 @@ class LikeSerializer(serializers.ModelSerializer):
         representation['user'] = instance.user.email
         return representation
 
+
 class ParsSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=255)
     photo = serializers.CharField(max_length=255)
@@ -86,29 +87,34 @@ class ParsSerializer(serializers.Serializer):
     link = serializers.CharField(max_length=300)
 
 
-# class FavoriteSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Favorite
-#         fields = ('id', 'movie', 'user', 'favorite')
-#
-#     def get_fields(self):
-#         action = self.context.get('action')
-#         fields = super().get_fields()
-#         if action == 'create':
-#             fields.pop('user')
-#             fields.pop('favorite')
-#         return fields
-#
-#     def create(self, validated_data):
-#         request = self.context.get('request')
-#         user = request.user
-#         movie = validated_data.get('movie')
-#         favorite = Favorite.objects.get_or_create(user=user, movie=movie)[0]
-#         favorite.favorite = True if favorite.favorite == False else False
-#         favorite.save()
-#         return favorite
-#
-#
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = ('id', 'product', 'favorite')
+
+    def get_fields(self):
+        action = self.context.get('action')
+        fields = super().get_fields()
+        if action == 'create':
+            fields.pop('favorite')
+        return fields
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user
+        product = validated_data.get('product')
+        favorite = Favorite.objects.get_or_create(user=user, product=product)[0]
+        favorite.favorite = True if favorite.favorite == False else False
+        favorite.save()
+        return favorite
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['favourite'] = instance.favorite
+        representation['user'] = instance.user.email
+        return representation
+
+
 # class RatingSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Rating

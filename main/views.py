@@ -71,21 +71,28 @@ class LikeViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gener
         return {'request': self.request, 'action': self.action}
 
 
+class FavoriteListView(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def get_queryset(self):
+        query = self.request.user
+        queryset = Favorite.objects.filter(user=query, favorite=True)
+        return queryset
+
+    def get_serializer_context(self):
+        return {'request': self.request, 'action': self.action}
+
+
 class ParsOcView(APIView):
     def get(self, request):
         dict_ = pars()
         serializer = ParsSerializer(instance=dict_, many=True)
         return Response(serializer.data)
 
-# class FavoriteViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
-#     queryset = Favorite.objects.all()
-#     serializer_class = FavoriteSerializer
-#     permission_classes = [IsAuthenticated, ]
-#
-#     def get_serializer_context(self):
-#         return {'request': self.request, 'action': self.action}
-#
-#
+
+
 # class RatingViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
 #     queryset = Rating.objects.all()
 #     serializer_class = RatingSerializer

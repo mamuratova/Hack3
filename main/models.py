@@ -76,7 +76,13 @@ class Like(models.Model):
 #     rating = models.PositiveSmallIntegerField(default=0)
 
 
+class Favorite(models.Model):
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='favorites')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='favorites')
+    favorite = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ('product', )
 
 
 

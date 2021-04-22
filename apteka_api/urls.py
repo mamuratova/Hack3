@@ -24,13 +24,6 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from main.views import *
 
-router = DefaultRouter()
-router.register('products', ProductViewSet)
-router.register('comments', CommentViewSet)
-router.register('likes', LikeViewSet)
-# router.register('favorites', FavoriteViewSet)
-# router.register('ratings', RatingViewSet)
-
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -45,20 +38,29 @@ schema_view = get_schema_view(
    permission_classes=(permissions.AllowAny,),
 )
 
+router = DefaultRouter()
+router.register('products', ProductViewSet)
+router.register('comments', CommentViewSet)
+router.register('likes', LikeViewSet)
+router.register('favor', FavoriteListView)
+# router.register('ratings', RatingViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('account/', include('account.urls')),
+    path('api/v1/account/', include('account.urls')),
     path('api/v1/', include(router.urls)),
-    path('api/v1/categories/', include('main.urls')),
+    path('api/v1/favor/', include('main.urls')),
+    path('api/v1/categories/', include(router.urls)),
     path('api/v1/likes/', include('main.urls')),
     path('api/v1/pars/', ParsOcView.as_view()),
-    path('cart/', include('cart.urls')),
+    path('api/v1/cart/', include('cart.urls')),
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('auth', include('rest_framework_social_oauth2.urls')),
+    # path('auth', include('rest_framework_social_oauth2.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
 
