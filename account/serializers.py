@@ -68,7 +68,6 @@ class CustomLoginSerializer(serializers.Serializer):
 
 class CreateNewPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    activation_code = serializers.CharField(min_length=20)
     password = serializers.CharField(min_length=6, required=True)
     password_confirmation = serializers.CharField(min_length=6, required=True)
 
@@ -76,11 +75,6 @@ class CreateNewPasswordSerializer(serializers.Serializer):
         if not MyUser.objects.filter(email=email).exists():
             raise serializers.ValidationError('User with given email does not exist')
         return email
-
-    def validate_activation_code(self, activation_code):
-        # if not MyUser.objects.filter(activation_code=activation_code, is_active=False).exists():
-        #     raise serializers.ValidationError('Wrong activation code')
-        return activation_code
 
     def validate(self, attrs):
         email = attrs.get('email')
@@ -94,14 +88,11 @@ class CreateNewPasswordSerializer(serializers.Serializer):
     def save(self, **kwargs):
         data = self.validated_data
         email = data.get('email')
-        code = data.get('activation_code')
         password = data.get('password')
         try:
-            user = MyUser.objects.get(email=email, activation_code=code, is_active=True)
+            user = MyUser.objects.get(email=email, is_active=True)
         except:
             raise serializers.ValidationError('User not found')
-        user.is_active = True
-        user.activation_code = ''
         user.set_password(password)
         user.save()
         return user
