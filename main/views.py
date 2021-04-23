@@ -23,6 +23,7 @@ class MyPaginationClass(PageNumberPagination):
             data[i]['likes'] = len(likes)
             comments = data[i]['comments']
             data[i]['comments'] = len(comments)
+            data[i]['recommends'] = len(data[i]['recommends'])
         return super().get_paginated_response(data)
 
 

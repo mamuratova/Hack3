@@ -42,14 +42,14 @@ router = DefaultRouter()
 router.register('products', ProductViewSet)
 router.register('comments', CommentViewSet)
 router.register('likes', LikeViewSet)
-router.register('favor', FavoriteListView)
+router.register('favorities', FavoriteListView)
 # router.register('ratings', RatingViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/account/', include('account.urls')),
     path('api/v1/', include(router.urls)),
-    path('api/v1/favor/', include('main.urls')),
+    path('api/v1/favorities/', include(router.urls)),
     path('api/v1/categories/', include(router.urls)),
     path('api/v1/likes/', include('main.urls')),
     path('api/v1/pars/', ParsOcView.as_view()),

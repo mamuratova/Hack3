@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    # recommendation = serializers.ReadOnlyField()
     author = serializers.ReadOnlyField(source='author.email')
     created = serializers.DateTimeField(format='%d %B %Y %H:%M', read_only=True)
 
@@ -29,6 +30,7 @@ class ProductSerializer(serializers.ModelSerializer):
         likes = LikeSerializer(instance.likes.filter(like=True), many=True, context=self.context).data
         representation['comments'] = comments
         representation['likes'] = likes
+        representation['recommends'] = RecommendSerializer(Product.objects.filter(category=instance.category)[:3],many=True).data
         return representation
 
 
@@ -50,6 +52,17 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+
+#
+# class RecommendationSerializer(serializers.Serializer):
+#     title = serializers.CharField(max_length=100)
+#     category = serializers.CharField(max_length=100)
+
+
+class RecommendSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('name', 'price', 'category', )
 
 
 class LikeSerializer(serializers.ModelSerializer):
@@ -88,9 +101,11 @@ class ParsSerializer(serializers.Serializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='account.MyUser')
+
     class Meta:
         model = Favorite
-        fields = ('id', 'product', 'favorite')
+        fields = ('id', 'product', 'favorite', 'user')
 
     def get_fields(self):
         action = self.context.get('action')
