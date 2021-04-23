@@ -55,7 +55,6 @@ class Comment(models.Model):
     comment = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(MyUser, on_delete=models.DO_NOTHING, related_name='comments')
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
 
     def __str__(self):
